@@ -1,0 +1,76 @@
+from math import sqrt
+
+# points is a list that contains all of our data points
+points = [(0.1, 0.6), (0.15, 0.71), (0.08, 0.9), (0.16, 0.85), (0.2, 0.3), (0.25, 0.5), (0.24, 0.1), (0.3, 0.2)]
+
+# m1 and m2 are centers(means) of the clusters
+m1 = (0.1, 0.6)
+m2 = (0.3, 0.2)
+
+# we will store the data points in clusters as c1 and c2
+c1 = []
+c2 = []
+
+# we will store what point belongs to what cluster in the clusters dictionary
+#clusters = {point:-1 for point in points}
+
+# distance calculates the euclidean distance between any two points
+def distance(p1, p2):
+	return sqrt((p1[0]-p2[0])**2 + (p1[1] - p2[1])**2)
+
+# recluster function calculates the cluster a point will belong to and then allocates it
+def recluster():
+	# global takes the variables from global scope
+	global points, m1, m2, c1, c2 #, clusters
+	# we clear the clusters using clear function of list
+	c1.clear()
+	c2.clear()
+	# now we iterate over every point in the points list
+	for point in points:
+		# we calculate the distance of the point from both means
+		d1 = distance(point, m1)
+		d2 = distance(point, m2)
+		
+		# we allocate cluster depending on which one is closer
+		if d1 < d2:
+			c1.append(point)
+			#clusters[point] = 1
+		else:
+			c2.append(point)
+			#clusters[point] = 2
+		
+# This function is used to calculate mean of a cluster
+def calculate_mean(cluster):
+	x = 0
+	y = 0
+	n = 0
+	for point in cluster:
+		x += point[0]
+		y += point[1]
+		n += 1
+	
+	return (x/n, y/n)
+
+# We use this boolean variable to decide when we should stop
+clusters_found = False
+
+while not clusters_found:
+	recluster()
+	# we save previous means to compare later
+	prevm1 = m1
+	prevm2 = m2
+	m1 = calculate_mean(c1)
+	m2 = calculate_mean(c2)
+	
+	# we stop recalculating clusters and means if we find no difference between old and new means
+	if prevm1==m1 and prevm2 == m2:
+		clusters_found = True
+
+#for point, cluster in clusters.items():
+#	print(point, cluster)
+
+print('Cluster 1:', c1)
+print('Cluster 2:', c2)
+
+print('Mean of cluster 1:', m1)
+print('Mean of cluster 2:', m2)
